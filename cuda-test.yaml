@@ -6,8 +6,8 @@ spec:
   restartPolicy: OnFailure
   containers:
   - name: cuda-ubuntu2204
-    #image: "nvcr.io/nvidia/cuda:12.4.0-base-ubuntu22.04"
-    image: "nvcr.io/nvidia/cuda:12.6.3-base-ubi9"
+    image: "nvcr.io/nvidia/cuda:12.4.0-base-ubuntu22.04"
+    #image: "nvcr.io/nvidia/cuda:12.6.3-base-ubuntu24.04"
     resources:
       limits:
         nvidia.com/gpu: 1
