@@ -1,0 +1,25 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: gpu-burn-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gpu-burn-test
+  template:
+    metadata:
+      labels:
+        app: gpu-burn-test
+    spec:
+      containers:
+        - name: container-1
+          image: docker.io/chrstnhntschl/gpu_burn:latest
+          command:
+            - sleep
+            - '100000'
+          resources:
+            limits:
+              nvidia.com/gpucores: '10'
+              nvidia.com/gpumem: '200'
+              nvidia.com/gpu: '1'
