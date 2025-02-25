@@ -1,0 +1,32 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: hami-scheduler-svc-monitor
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: hami-scheduler
+  namespaceSelector:
+    matchNames:
+      - "kube-system"
+  endpoints:
+  - path: /metrics
+    port: monitor
+    interval: "15s"
+    honorLabels: false
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_endpoints_name]
+      regex: hami-.*
+      replacement: $1
+      action: keep
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      regex: (.*)
+      targetLabel: node_name
+      replacement: ${1}
+      action: replace
+    - sourceLabels: [__meta_kubernetes_pod_host_ip]
+      regex: (.*)
+      targetLabel: ip
+      replacement: $1
+      action: replace
