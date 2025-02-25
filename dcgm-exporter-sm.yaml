@@ -1,0 +1,21 @@
+serviceMonitor:
+  enabled: true
+  interval: 15s
+  honorLabels: false
+  additionalLabels: {}
+    #monitoring: prometheus
+  relabelings:
+  - sourceLabels: [__meta_kubernetes_endpoints_name]
+    regex: dcgm-exporter
+    replacement: $1
+    action: keep
+  - sourceLabels: [__meta_kubernetes_pod_node_name]
+    regex: (.*)
+    targetLabel: node_name
+    replacement: ${1}
+    action: replace
+  - sourceLabels: [__meta_kubernetes_pod_host_ip]
+    regex: (.*)
+    targetLabel: ip
+    replacement: $1
+    action: replace
