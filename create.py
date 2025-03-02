@@ -167,7 +167,8 @@ def create_argocd_application(username):
             "--sync-policy", "automated",
             "--auto-prune",
             "--allow-empty",
-            "--self-heal"
+            "--self-heal",
+            "--sync-option", "Replace=true"
         ]
         
         result = subprocess.run(command, capture_output=True, text=True, check=True)
@@ -201,27 +202,39 @@ def main():
     initial_files = {
         "README.md": "# Welcome to your repository\nThis is an initial file.",
         ".gitignore": "*.log",
-        "deploy/deployment.yaml": f"""apiVersion: v1
-kind: Pod
+        "deploy/deployment.yaml": """apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: demo
 spec:
-  restartPolicy: Never
-  containers:
-    - name: cuda-vectoradd
-      image: nvcr.io/nvidia/k8s/cuda-sample:vectoradd-cuda11.7.1-ubuntu20.04
-      env:
-      - name: GPU_CORE_UTILIZATION_POLICY
-        value: force
-      - name: NVIDIA_VISIBLE_DEVICES
-        value: none
-      resources:
-        limits:
-          cpu: "1"
-          memory: "2048Mi"
-          nvidia.com/gpu: 1
-          nvidia.com/gpumem: 8000
-          nvidia.com/gpucores: 30
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: demo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+      - image: ubuntu:22.04
+        name: echo-date
+        command: ["bash", "-c", "while true; do echo $(date); sleep 3; done"]
+        env:
+        - name: GPU_CORE_UTILIZATION_POLICY
+          value: force
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: none
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2048Mi"
+            nvidia.com/gpu: 1
+            nvidia.com/gpumem: 8000
+            nvidia.com/gpucores: 30
 """
     }
     
